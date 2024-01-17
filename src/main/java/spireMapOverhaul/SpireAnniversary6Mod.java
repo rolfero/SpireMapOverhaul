@@ -57,6 +57,7 @@ import spireMapOverhaul.util.Wiz;
 import spireMapOverhaul.util.ZoneShapeMaker;
 import spireMapOverhaul.zoneInterfaces.CampfireModifyingZone;
 import spireMapOverhaul.zoneInterfaces.EncounterModifyingZone;
+import spireMapOverhaul.zoneInterfaces.ModifiedEventRateZone;
 import spireMapOverhaul.zones.beastslair.BeastsLairZone;
 import spireMapOverhaul.zones.brokenspace.BrokenSpaceZone;
 import spireMapOverhaul.zones.manasurge.ui.extraicons.BlightIcon;
@@ -158,6 +159,10 @@ public class SpireAnniversary6Mod implements
         return modID + "Resources/images/relics/" + resourcePath;
     }
 
+    public static String makeMonsterPath(String resourcePath) {
+        return modID + "Resources/images/monsters/" + resourcePath;
+    }
+
     public static String makePowerPath(String resourcePath) {
         return modID + "Resources/images/powers/" + resourcePath;
     }
@@ -182,6 +187,7 @@ public class SpireAnniversary6Mod implements
             defaults.put("active", "TRUE");
             defaults.put("noRepeatZones", "TRUE");
             defaults.put("largeIconsMode", "FALSE");
+            defaults.put("enableShaders", "TRUE");
             modConfig = new SpireConfig(modID, "anniv6Config", defaults);
         } catch (Exception e) {
             e.printStackTrace();
@@ -327,80 +333,42 @@ public class SpireAnniversary6Mod implements
 
     private void loadStrings(String langKey) {
         if (!Gdx.files.internal(modID + "Resources/localization/" + langKey + "/").exists()) return;
-        String filepath = modID + "Resources/localization/" + langKey + "/Cardstrings.json";
-        if (Gdx.files.internal(filepath).exists()) {
-            BaseMod.loadCustomStringsFile(CardStrings.class, filepath);
-        }
-        filepath = modID + "Resources/localization/" + langKey + "/Relicstrings.json";
-        if (Gdx.files.internal(filepath).exists()) {
-            BaseMod.loadCustomStringsFile(RelicStrings.class, filepath);
-        }
-        filepath = modID + "Resources/localization/" + langKey + "/Powerstrings.json";
-        if (Gdx.files.internal(filepath).exists()) {
-            BaseMod.loadCustomStringsFile(PowerStrings.class, filepath);
-        }
-        filepath = modID + "Resources/localization/" + langKey + "/UIstrings.json";
-        if (Gdx.files.internal(filepath).exists()) {
-            BaseMod.loadCustomStringsFile(UIStrings.class, filepath);
-        }
-        filepath = modID + "Resources/localization/" + langKey + "/Stancestrings.json";
-        if (Gdx.files.internal(filepath).exists()) {
-            BaseMod.loadCustomStringsFile(StanceStrings.class, filepath);
-        }
-        filepath = modID + "Resources/localization/" + langKey + "/Orbstrings.json";
-        if (Gdx.files.internal(filepath).exists()) {
-            BaseMod.loadCustomStringsFile(OrbStrings.class, filepath);
-        }
-        filepath = modID + "Resources/localization/" + langKey + "/Potionstrings.json";
-        if (Gdx.files.internal(filepath).exists()) {
-            BaseMod.loadCustomStringsFile(PotionStrings.class, filepath);
-        }
-        filepath = modID + "Resources/localization/" + langKey + "/Eventstrings.json";
-        if (Gdx.files.internal(filepath).exists()) {
-            BaseMod.loadCustomStringsFile(EventStrings.class, filepath);
-        }
-        filepath = modID + "Resources/localization/" + langKey + "/Monsterstrings.json";
-        if (Gdx.files.internal(filepath).exists()) {
-            BaseMod.loadCustomStringsFile(MonsterStrings.class, filepath);
-        }
+        loadStringsFile(langKey, CardStrings.class);
+        loadStringsFile(langKey, RelicStrings.class);
+        loadStringsFile(langKey, PowerStrings.class);
+        loadStringsFile(langKey, UIStrings.class);
+        loadStringsFile(langKey, StanceStrings.class);
+        loadStringsFile(langKey, OrbStrings.class);
+        loadStringsFile(langKey, PotionStrings.class);
+        loadStringsFile(langKey, EventStrings.class);
+        loadStringsFile(langKey, MonsterStrings.class);
     }
 
     public void loadZoneStrings(Collection<AbstractZone> zones, String langKey) {
         for (AbstractZone zone : zones) {
-            String languageAndZone = langKey + "/" + zone.id + "/";
+            String languageAndZone = langKey + "/" + zone.id;
             String filepath = modID + "Resources/localization/" + languageAndZone;
             if (!Gdx.files.internal(filepath).exists()) {
                 continue;
             }
             logger.info("Loading strings for zone " + zone.id + "from \"resources/localization/" + languageAndZone + "\"");
 
-            if (Gdx.files.internal(filepath + "Cardstrings.json").exists()) {
-                BaseMod.loadCustomStringsFile(CardStrings.class, filepath + "Cardstrings.json");
-            }
-            if (Gdx.files.internal(filepath + "Relicstrings.json").exists()) {
-                BaseMod.loadCustomStringsFile(RelicStrings.class, filepath + "Relicstrings.json");
-            }
-            if (Gdx.files.internal(filepath + "Powerstrings.json").exists()) {
-                BaseMod.loadCustomStringsFile(PowerStrings.class, filepath + "Powerstrings.json");
-            }
-            if (Gdx.files.internal(filepath + "UIstrings.json").exists()) {
-                BaseMod.loadCustomStringsFile(UIStrings.class, filepath + "UIstrings.json");
-            }
-            if (Gdx.files.internal(filepath + "Stancestrings.json").exists()) {
-                BaseMod.loadCustomStringsFile(StanceStrings.class, filepath + "Stancestrings.json");
-            }
-            if (Gdx.files.internal(filepath + "Orbstrings.json").exists()) {
-                BaseMod.loadCustomStringsFile(OrbStrings.class, filepath + "Orbstrings.json");
-            }
-            if (Gdx.files.internal(filepath + "Potionstrings.json").exists()) {
-                BaseMod.loadCustomStringsFile(PotionStrings.class, filepath + "Potionstrings.json");
-            }
-            if (Gdx.files.internal(filepath + "Monsterstrings.json").exists()) {
-                BaseMod.loadCustomStringsFile(MonsterStrings.class, filepath + "Monsterstrings.json");
-            }
-            if (Gdx.files.internal(filepath + "Eventstrings.json").exists()) {
-                BaseMod.loadCustomStringsFile(EventStrings.class, filepath + "Eventstrings.json");
-            }
+            loadStringsFile(languageAndZone, CardStrings.class);
+            loadStringsFile(languageAndZone, RelicStrings.class);
+            loadStringsFile(languageAndZone, PowerStrings.class);
+            loadStringsFile(languageAndZone, UIStrings.class);
+            loadStringsFile(languageAndZone, StanceStrings.class);
+            loadStringsFile(languageAndZone, OrbStrings.class);
+            loadStringsFile(languageAndZone, PotionStrings.class);
+            loadStringsFile(languageAndZone, EventStrings.class);
+            loadStringsFile(languageAndZone, MonsterStrings.class);
+        }
+    }
+
+    private void loadStringsFile(String key, Class<?> stringType) {
+        String filepath = modID + "Resources/localization/" + key + "/" + stringType.getSimpleName().replace("Strings", "strings") + ".json";
+        if (Gdx.files.internal(filepath).exists()) {
+            BaseMod.loadCustomStringsFile(stringType, filepath);
         }
     }
 
@@ -530,6 +498,15 @@ public class SpireAnniversary6Mod implements
                 throw new RuntimeException(e);
             }
         }
+        unfilteredAllZones.stream()
+                .filter(z -> z instanceof ModifiedEventRateZone)
+                .forEach(z -> {
+                    Set<String> specEvents =  ((ModifiedEventRateZone) z).addSpecificEvents();
+                    if(specEvents != null) {
+                        Set<String> eventList = zoneEvents.computeIfAbsent(z.id, k -> new HashSet<>());
+                        eventList.addAll(specEvents);
+                    }
+                });
     }
 
     @Override
@@ -609,6 +586,9 @@ public class SpireAnniversary6Mod implements
     private AbstractZone filterViewedZone;
     private static final float DESC_X = 760f;
     private static final float DESC_Y = 575f;
+    private ModLabeledToggleButton shaderCheckbox;
+    private static final float SHADER_CHECKBOX_X = 400f;
+    private static final float SHADER_CHECKBOX_Y = 440f;
 
     private void initializeConfig() {
         UIStrings configStrings = CardCrawlGame.languagePack.getUIString(makeID("ConfigMenuText"));
@@ -652,6 +632,11 @@ public class SpireAnniversary6Mod implements
                 (button) -> setFilterConfig(filterViewedZone.id, button.enabled));
         settingsPanel.addUIElement(filterCheckbox);
         filterSetViewedZone(0);
+
+        shaderCheckbox = new ModLabeledToggleButton(configStrings.TEXT[6], SHADER_CHECKBOX_X, SHADER_CHECKBOX_Y, Color.WHITE, FontHelper.tipBodyFont, getShaderConfig(), null,
+                (label) -> {},
+                (button) -> setShaderConfig(button.enabled));
+        settingsPanel.addUIElement(shaderCheckbox);
 
         BaseMod.registerModBadge(badge, configStrings.TEXT[0], configStrings.TEXT[1], configStrings.TEXT[2], settingsPanel);
     }
@@ -828,6 +813,21 @@ public class SpireAnniversary6Mod implements
                 e.printStackTrace();
             }
         }
+    }
+
+    private static void setShaderConfig(boolean enable) {
+        if (modConfig != null) {
+            modConfig.setBool("enableShaders", enable);
+            try {
+                modConfig.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static boolean getShaderConfig() {
+        return modConfig != null && modConfig.getBool("enableShaders");
     }
 
     private static ZoneShapeMaker shapeUi = null;
